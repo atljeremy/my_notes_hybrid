@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+
+    <item android:id="@+id/load_from_content_provider"
+          android:icon="@drawable/my_notes_icon"
+          android:title="@string/testingContentProvider"
+          android:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/sync_notes"
+          android:icon="@drawable/ic_action_refresh"
+          android:title="@string/syncNotes"
+          android:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/new_note"
+          android:icon="@drawable/ic_action_edit"
+          android:title="@string/newNote"
+          android:showAsAction="ifRoom|withText" />
+
+</menu>

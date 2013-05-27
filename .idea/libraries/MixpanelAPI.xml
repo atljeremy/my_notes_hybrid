@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="MixpanelAPI">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/MixpanelAPI.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

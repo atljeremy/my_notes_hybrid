@@ -1,0 +1,108 @@
+com.jeremyfox.My_Notes.Activities.MainActivity:
+    private static final int DEFAULT_HOME_VIEW
+    private static final int NOTES_VIEW
+    private static final int NOTE_DETAILS_VIEW
+com.jeremyfox.My_Notes.BuildConfig
+com.jeremyfox.My_Notes.Classes.BasicNote:
+    27:28:public void setTitle(java.lang.String)
+    37:38:public void setDetails(java.lang.String)
+    60:61:public void setRecordId(int)
+com.jeremyfox.My_Notes.Dialogs.NoteDetailsDialog
+com.jeremyfox.My_Notes.Helpers.PrefsHelper:
+    13:13:public PrefsHelper()
+com.jeremyfox.My_Notes.Interfaces.Note
+com.jeremyfox.My_Notes.Managers.AnalyticsManager:
+    private static final java.lang.String API_TOKEN
+    private static final java.lang.String API_TOKEN_DEBUG
+com.jeremyfox.My_Notes.Managers.NetworkManager:
+    public static final int FAILURE_UNKNOWN_STATUS
+    public static final int SUCCESS_STATUS
+    public static final int SUCCESS_RECORD_CREATED_STATUS
+    public static final int SUCCESS_RECORD_DELETED_STATUS
+    public static final int NOT_MODIFIED_STATUS
+    public static final java.lang.String API_HOST
+    137:158:public org.json.JSONArray executeSynchronousGetRequest(android.content.Context,java.lang.String)
+com.jeremyfox.My_Notes.R
+com.jeremyfox.My_Notes.R$attr
+com.jeremyfox.My_Notes.R$drawable
+com.jeremyfox.My_Notes.R$id
+com.jeremyfox.My_Notes.R$layout
+com.jeremyfox.My_Notes.R$menu
+com.jeremyfox.My_Notes.R$string
+com.jeremyfox.My_Notes.R$style
+com.mixpanel.android.mpmetrics.AnalyticsMessages:
+    private static final java.lang.String LOGTAG
+    57:58:public void logPosts()
+    84:89:public void setFlushInterval(long)
+    92:97:public void setFallbackHost(java.lang.String)
+    100:105:public void setEndpointHost(java.lang.String)
+    108:112:public void hardKill()
+    118:118:boolean isDead()
+com.mixpanel.android.mpmetrics.ConfigurationChecker
+com.mixpanel.android.mpmetrics.GCMReceiver
+com.mixpanel.android.mpmetrics.GCMReceiver$1
+com.mixpanel.android.mpmetrics.GCMReceiver$2
+com.mixpanel.android.mpmetrics.HttpPoster:
+    private static final java.lang.String LOGTAG
+com.mixpanel.android.mpmetrics.MPConfig
+com.mixpanel.android.mpmetrics.MPDbAdapter:
+    private static final java.lang.String LOGTAG
+    private static final java.lang.String DATABASE_NAME
+    private static final int DATABASE_VERSION
+    public static final java.lang.String KEY_DATA
+    public static final java.lang.String KEY_CREATED_AT
+com.mixpanel.android.mpmetrics.MixpanelAPI:
+    public static final java.lang.String VERSION
+    private static final java.lang.String LOGTAG
+    152:154:public static void setFlushInterval(android.content.Context,long)
+    166:171:public static void enableFallbackServer(android.content.Context,boolean)
+    199:201:public void identify(java.lang.String)
+    331:334:public void unregisterSuperProperty(java.lang.String)
+    348:360:public void registerSuperPropertiesOnce(org.json.JSONObject)
+    375:376:public void clearSuperProperties()
+    637:638:public void logPosts()
+    647:654:static void allInstances(com.mixpanel.android.mpmetrics.MixpanelAPI$InstanceProcessor)
+    673:677:void clearPreferences()
+    88:88:static synthetic java.lang.String access$102(com.mixpanel.android.mpmetrics.MixpanelAPI,java.lang.String)
+    88:88:static synthetic void access$400(com.mixpanel.android.mpmetrics.MixpanelAPI)
+    88:88:static synthetic java.text.DateFormat access$600()
+    88:88:static synthetic android.content.SharedPreferences access$700(com.mixpanel.android.mpmetrics.MixpanelAPI)
+    88:88:static synthetic android.content.Context access$800(com.mixpanel.android.mpmetrics.MixpanelAPI)
+com.mixpanel.android.mpmetrics.MixpanelAPI$InstanceProcessor
+com.mixpanel.android.mpmetrics.MixpanelAPI$People:
+    public abstract void identify(java.lang.String)
+    public abstract void set(java.lang.String,java.lang.Object)
+    public abstract void increment(java.lang.String,double)
+    public abstract void trackCharge(double,org.json.JSONObject)
+    public abstract void clearCharges()
+    public abstract void deleteUser()
+    public abstract void initPushHandling(java.lang.String)
+    public abstract void setPushRegistrationId(java.lang.String)
+    public abstract void clearPushRegistrationId()
+    public abstract java.lang.String getDistinctId()
+com.mixpanel.android.mpmetrics.MixpanelAPI$PeopleImpl:
+    684:689:public void identify(java.lang.String)
+    715:719:public void set(java.lang.String,java.lang.Object)
+    743:746:public void increment(java.lang.String,double)
+    779:797:public void trackCharge(double,org.json.JSONObject)
+    804:806:public void clearCharges()
+    811:821:public void deleteUser()
+    826:838:public void setPushRegistrationId(java.lang.String)
+    844:846:public void clearPushRegistrationId()
+    852:879:public void initPushHandling(java.lang.String)
+    883:883:public java.lang.String getDistinctId()
+    887:887:public java.lang.String getPushId()
+com.mixpanel.android.mpmetrics.MixpanelAPI$PeopleImpl$1
+com.mixpanel.android.mpmetrics.SystemInformation:
+    public static final java.lang.String LOGTAG
+    78:78:public java.lang.Integer getAppVersionCode()
+    87:109:public java.lang.String getPhoneRadioType()
+com.mixpanel.android.mpmetrics.WaitingPeopleRecord:
+    private static final java.lang.String LOGTAG
+com.mixpanel.android.util.Base64Coder:
+    20:20:public Base64Coder()
+    89:89:public static java.lang.String decodeString(java.lang.String)
+    98:98:public static byte[] decode(java.lang.String)
+    108:134:public static byte[] decode(char[])
+com.mixpanel.android.util.StringUtils:
+    8:8:public StringUtils()

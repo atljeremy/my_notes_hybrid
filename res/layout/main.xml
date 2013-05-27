@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              style="@style/DefaultMainLayoutContainer">
+    <ViewFlipper android:id="@+id/ViewFlipper"
+                 style="@style/DefaultMainLayoutContainer">
+
+        <ImageView android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="top|right"
+                   android:src="@drawable/new_note_instruction"></ImageView>
+
+        <GridView android:id="@+id/gridview"
+                  style="@style/DefaultGridView"/>
+
+    </ViewFlipper>
+</LinearLayout>
+

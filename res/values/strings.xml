@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Notes</string>
+    <string name="notesTitle">Note Title: </string>
+    <string name="notesDetails">Note Details:</string>
+    <string name="newNote">New Note</string>
+    <string name="titleInputHint">Title</string>
+    <string name="detailsInputHint">Note Details</string>
+    <string name="allFeildsRequired">All Fields Required</string>
+    <string name="dateFormat">MM.dd.yy</string>
+    <string name="dash">-</string>
+    <string name="noteSaved">Note Saved!</string>
+    <string name="createNewNote">Create A New Note</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="dismiss">Dismiss Note</string>
+    <string name="notes">notes</string>
+    <string name="notesJson">notes.json</string>
+    <string name="user_id">user_id</string>
+    <string name="unique_id">unique_id</string>
+    <string name="deleteNote">Delete Note</string>
+    <string name="editNote">Edit Note</string>
+    <string name="syncNotes">Sync Notes</string>
+    <string name="share_note">Share</string>
+    <string name="titleKey">title</string>
+    <string name="detailsKey">details</string>
+    <string name="idKey">id</string>
+    <string name="error_saving_note">There was an error saving your note. Please try again.</string>
+    <string name="unexpected_error">Sorry, an unexpected error has occurred. Please try again.</string>
+    <string name="error_deleting_note">An error occurred and your note was not deleted. Please try agian.</string>
+    <string name="deleting_note">Deleting Note</string><string name="note_title">Note Title</string><string name="note_details">Note Details</string>
+    <string name="myNotesAPIServie">MyNotesAPIService</string>
+    <string name="notesUpdated">Notes Updated</string>
+    <string name="notesDeleted">Notes Deleted</string>
+    <string name="recordIDKey">recordIDKey</string>
+    <string name="savingNote">saving note</string>
+    <string name="testingContentProvider">Testing Content Provider</string>
+</resources>
