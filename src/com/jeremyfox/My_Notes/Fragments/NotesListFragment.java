@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.*;
@@ -67,13 +66,6 @@ public class NotesListFragment extends Fragment {
          * @param notesArray the notes array
          */
         public void deleteNotes(ArrayList<Note> notesArray);
-
-        /**
-         * Query content provider.
-         *
-         * @return the cursor
-         */
-        public Cursor queryContentProvider();
     }
 
     private NotesListListener listener;
@@ -185,25 +177,6 @@ public class NotesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem menu) {
         switch (menu.getItemId()) {
-            case R.id.load_from_content_provider:
-                Cursor cursor = listener.queryContentProvider();
-                if (null != cursor) {
-                    JSONArray notesFromProvider = new JSONArray();
-                    while (cursor.moveToNext()) {
-                        int recordID   = cursor.getInt(1);
-                        String title   = cursor.getString(2);
-                        String details = cursor.getString(3);
-
-                        notesFromProvider.put(new BasicNote(title, details, recordID));
-                    }
-
-                    if (notesFromProvider.length() > 0) {
-                        NotesManager.getInstance().setNotesFromProvider(getActivity(), notesFromProvider);
-                        setGridViewItems();
-                        showLoadedNotesFromProviderDialog();
-                    }
-                }
-                break;
 
             case R.id.new_note:
                 listener.newNoteAction();
@@ -408,20 +381,4 @@ public class NotesListFragment extends Fragment {
         this.dialog.show();
         AnalyticsManager.getInstance().fireEvent("showed deleting note dialog", null);
     }
-
-    /**
-     * Show loading error.
-     */
-    public void showLoadedNotesFromProviderDialog() {
-        this.dialog.dismiss();
-
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Process Complete!")
-                .setMessage("The current notes in the grid view have been loaded via the My Notes content provider." +
-                        "\n See the NotesListFragment.java from line 190 to 207 for the code that is mkaing this happen.")
-                .setNegativeButton("Ok", null)
-                .create()
-                .show();
-    }
-
 }

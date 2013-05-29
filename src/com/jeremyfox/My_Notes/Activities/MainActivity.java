@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,11 +15,12 @@ import com.jeremyfox.My_Notes.Adapters.NotesAdapter;
 import com.jeremyfox.My_Notes.Classes.BasicNote;
 import com.jeremyfox.My_Notes.Classes.MyNotesAPIResultReceiver;
 import com.jeremyfox.My_Notes.Classes.ResponseObject;
-import com.jeremyfox.My_Notes.ContentProviders.NotesProvider;
 import com.jeremyfox.My_Notes.Dialogs.NewNoteDialog;
 import com.jeremyfox.My_Notes.Fragments.NoteDetailsFragment;
 import com.jeremyfox.My_Notes.Fragments.NotesListFragment;
+import com.jeremyfox.My_Notes.Helpers.APIHelper;
 import com.jeremyfox.My_Notes.Helpers.PrefsHelper;
+import com.jeremyfox.My_Notes.Interfaces.APIResponse;
 import com.jeremyfox.My_Notes.Interfaces.NetworkCallback;
 import com.jeremyfox.My_Notes.Interfaces.Note;
 import com.jeremyfox.My_Notes.Managers.AnalyticsManager;
@@ -38,23 +38,22 @@ import java.util.HashMap;
 /**
  * The Main activity.
  */
-public class MainActivity extends Activity implements NotesListFragment.NotesListListener, NoteDetailsFragment.NoteDetailsListener, MyNotesAPIResultReceiver.Receiver {
+public class MainActivity extends Activity implements NotesListFragment.NotesListListener, NoteDetailsFragment.NoteDetailsListener {
 
     /**
      * The constant ACTIVITY.
      */
     public static Activity ACTIVITY;
-    private static final int NEW_NOTE_REQUEST_CODE = 1;
     private GridView gridView;
-    private Note note;
-    private NotesListFragment notesListFragment;
-    private MyNotesAPIResultReceiver receiver;
+    public NotesListFragment notesListFragment;
+    private APIHelper apiHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notes_list_fragment);
 
+        this.apiHelper = new APIHelper(this);
         this.ACTIVITY = this;
         this.gridView = (GridView)findViewById(R.id.gridview);
         this.notesListFragment = (NotesListFragment)getFragmentManager().findFragmentById(R.id.notes_list_fragment);
@@ -85,7 +84,7 @@ public class MainActivity extends Activity implements NotesListFragment.NotesLis
         if (null != notesAdapter) notesAdapter.setShouldIncrementCounter(true);
         AnalyticsManager.getInstance().fireEvent("selected new note option", null);
         Intent newNoteIntent = new Intent(this, NewNoteActivity.class);
-        startActivityForResult(newNoteIntent, NEW_NOTE_REQUEST_CODE);
+        startActivity(newNoteIntent);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class MainActivity extends Activity implements NotesListFragment.NotesLis
             @Override
             public void onSuccess(Object json) {
                 try {
-                    String unique_id = ((JSONObject)json).getString(getString(R.string.unique_id));
+                    String unique_id = ((JSONObject) json).getString(getString(R.string.unique_id));
                     PrefsHelper.setPref(getBaseContext(), getString(R.string.user_id), unique_id);
                     AnalyticsManager.getInstance().registerSuperProperty("user API key", unique_id);
                     callback.onSuccess(null);
@@ -116,163 +115,88 @@ public class MainActivity extends Activity implements NotesListFragment.NotesLis
         });
     }
 
-    /**
-     * MyNotesAPIService GET notes request
-     */
     @Override
     public void requestNotesFromAPI() {
-        this.receiver = new MyNotesAPIResultReceiver(new Handler());
-        this.receiver.setReceiver(this);
-        final Intent intent = new Intent(Intent.ACTION_SYNC, null, this, MyNotesAPIService.class);
-        intent.putExtra("receiver", this.receiver);
-        intent.putExtra("action", MyNotesAPIService.GET_NOTES);
-        startService(intent);
+        this.apiHelper.requestNotesFromAPI(new APIResponse() {
+            @Override
+            public void requestNotesSuccessfulResponse(JSONArray array) {
+                NotesManager.getInstance().setNotes(MainActivity.this, array);
+                MainActivity.this.notesListFragment.createGridView();
+                AnalyticsManager.getInstance().fireEvent("successfully retrieved notes from API", null);
+            }
+
+            @Override
+            public void requestNotesFailureResponse() {
+                MainActivity.this.notesListFragment.showLoadingError();
+                AnalyticsManager.getInstance().fireEvent("error retrieving notes from API", null);
+            }
+
+            @Override
+            public void saveNoteSuccessfulResponse() {
+            }
+            @Override
+            public void saveNoteFailureResponse() {
+            }
+            @Override
+            public void editNoteSuccessfulResponse(JSONObject object) {
+            }
+            @Override
+            public void editNoteFailureResponse() {
+            }
+            @Override
+            public void deleteNotesSuccessfulResponse() {
+            }
+            @Override
+            public void deleteNotesFailureResponse() {
+            }
+
+            @Override
+            public void serviceError() {
+                MainActivity.this.notesListFragment.showLoadingError();
+            }
+        });
     }
 
-    /**
-     * MyNotesAPIService POST new note request
-     * @param title the title
-     * @param details the details
-     */
-    public void saveNoteToAPI(String title, String details) {
-        this.receiver = new MyNotesAPIResultReceiver(new Handler());
-        this.receiver.setReceiver(this);
-        final Intent intent = new Intent(Intent.ACTION_SYNC, null, this, MyNotesAPIService.class);
-        intent.putExtra("title", title);
-        intent.putExtra("details", details);
-        intent.putExtra("receiver", this.receiver);
-        intent.putExtra("action", MyNotesAPIService.SAVE_NOTE);
-        startService(intent);
-    }
-
-    /**
-     * MyNotesAPIService DELETE notes request
-     * @param notesArray
-     */
     @Override
     public void deleteNotes(ArrayList<Note> notesArray) {
-        this.receiver = new MyNotesAPIResultReceiver(new Handler());
-        this.receiver.setReceiver(this);
-        final Intent intent = new Intent(Intent.ACTION_SYNC, null, this, MyNotesAPIService.class);
-        intent.putParcelableArrayListExtra("notesArray", notesArray);
-        intent.putExtra("receiver", this.receiver);
-        intent.putExtra("action", MyNotesAPIService.DELETE_NOTES);
-        startService(intent);
-    }
+        this.apiHelper.deleteNotes(notesArray, new APIResponse() {
+            @Override
+            public void requestNotesSuccessfulResponse(JSONArray array) {
+            }
+            @Override
+            public void requestNotesFailureResponse() {
+            }
+            @Override
+            public void saveNoteSuccessfulResponse() {
+            }
+            @Override
+            public void saveNoteFailureResponse() {
+            }
+            @Override
+            public void editNoteSuccessfulResponse(JSONObject object) {
+            }
+            @Override
+            public void editNoteFailureResponse() {
+            }
 
-    /**
-     * MyNotesAPIService PUT edited note request
-     * @param recordID the record iD
-     * @param title the title
-     * @param details the details
-     */
-    public void updateNoteToAPI(int recordID, String title, String details) {
-        this.receiver = new MyNotesAPIResultReceiver(new Handler());
-        this.receiver.setReceiver(this);
-        final Intent intent = new Intent(Intent.ACTION_SYNC, null, this, MyNotesAPIService.class);
-        intent.putExtra("title", title);
-        intent.putExtra("details", details);
-        intent.putExtra("recordID", recordID);
-        intent.putExtra("receiver", this.receiver);
-        intent.putExtra("action", MyNotesAPIService.EDIT_NOTES);
-        startService(intent);
-    }
+            @Override
+            public void deleteNotesSuccessfulResponse() {
+                MainActivity.this.notesListFragment.setGridViewItems();
+                Toast.makeText(MainActivity.this, getString(R.string.notesDeleted), Toast.LENGTH_SHORT).show();
+                AnalyticsManager.getInstance().fireEvent("successfully deleted note from API", null);
+            }
 
-    /**
-     * Called from the MyNotesAPIService to report the status of the request (RUNNING, FINISHED, ERROR)
-     *
-     * @param resultCode
-     * @param resultData
-     */
-    @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        ResponseObject responseObject;
-        int action = resultData.getInt("action");
-        switch (resultCode) {
-            case MyNotesAPIService.STATUS_RUNNING:
-                Log.d("MainActivity", "STATUS_RUNNING");
-                break;
+            @Override
+            public void deleteNotesFailureResponse() {
+                MainActivity.this.notesListFragment.showSavingError();
+                AnalyticsManager.getInstance().fireEvent("error deleting note from API", null);
+            }
 
-            case MyNotesAPIService.STATUS_FINISHED:
-                responseObject = (ResponseObject)resultData.getSerializable("result");
-                switch (action) {
-                    case MyNotesAPIService.GET_NOTES:
-                        if (responseObject.getStatus() == ResponseObject.RequestStatus.STATUS_SUCCESS) {
-                            if (responseObject.getObject() instanceof JSONArray) {
-                                JSONArray array = (JSONArray)responseObject.getObject();
-                                NotesManager.getInstance().setNotes(this, array);
-                                MainActivity.this.notesListFragment.createGridView();
-                                AnalyticsManager.getInstance().fireEvent("successfully retrieved notes from API", null);
-                            }
-                        } else {
-                            MainActivity.this.notesListFragment.showLoadingError();
-                            AnalyticsManager.getInstance().fireEvent("error retrieving notes from API", null);
-                        }
-                        break;
-
-                    case MyNotesAPIService.SAVE_NOTE:
-                        if (responseObject.getStatus() == ResponseObject.RequestStatus.STATUS_SUCCESS) {
-                            if (responseObject.getObject() instanceof JSONObject) {
-                                MainActivity.this.notesListFragment.requestNotes();
-                                Toast.makeText(MainActivity.this, getString(R.string.noteSaved), Toast.LENGTH_SHORT).show();
-                                AnalyticsManager.getInstance().fireEvent("new note created successfully", null);
-                            }
-                        } else {
-                            MainActivity.this.notesListFragment.showSavingError();
-                            AnalyticsManager.getInstance().fireEvent("error saving new note to API", null);
-                        }
-                        break;
-
-                    case MyNotesAPIService.EDIT_NOTES:
-                        NoteDetailsFragment.FRAGMENT.dismissDialog();
-                        if (responseObject.getStatus() == ResponseObject.RequestStatus.STATUS_SUCCESS) {
-                            if (responseObject.getObject() instanceof JSONObject) {
-                                JSONObject jsonObject = (JSONObject)responseObject.getObject();
-                                String title = null;
-                                String details = null;
-                                try {
-                                    title = jsonObject.getString("title");
-                                    details = jsonObject.getString("details");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                                if (null != title && null != details) {
-                                    NoteDetailsFragment.FRAGMENT.updateCurrentNote(title, details);
-                                }
-
-                                Toast.makeText(MainActivity.this, getString(R.string.notesUpdated), Toast.LENGTH_SHORT).show();
-                                AnalyticsManager.getInstance().fireEvent("note updated successfully", null);
-                            }
-                        } else {
-                            NoteDetailsFragment.FRAGMENT.showLoadingError();
-                            AnalyticsManager.getInstance().fireEvent("error updating note to API", null);
-                        }
-                        break;
-
-                    case MyNotesAPIService.DELETE_NOTES:
-                        if (responseObject.getStatus() == ResponseObject.RequestStatus.STATUS_SUCCESS) {
-                            MainActivity.this.notesListFragment.setGridViewItems();
-                            Toast.makeText(MainActivity.this, getString(R.string.notesDeleted), Toast.LENGTH_SHORT).show();
-                            AnalyticsManager.getInstance().fireEvent("successfully deleted note from API", null);
-                        } else {
-                            MainActivity.this.notesListFragment.showSavingError();
-                            AnalyticsManager.getInstance().fireEvent("error deleting note from API", null);
-                        }
-                        break;
-                }
-                Log.d("MainActivity", "STATUS_FINISHED");
-                break;
-
-            case MyNotesAPIService.STATUS_ERROR:
-                Log.d("MainActivity", "STATUS_ERROR");
+            @Override
+            public void serviceError() {
                 MainActivity.this.notesListFragment.showLoadingError();
-                break;
-
-            default:
-                Log.d("default", "default");
-                break;
-        }
+            }
+        });
     }
 
     @Override
@@ -295,7 +219,62 @@ public class MainActivity extends Activity implements NotesListFragment.NotesLis
                     } else {
                         final String title = titleInput.getText().toString();
                         final String details = detailsInput.getText().toString();
-                        updateNoteToAPI(note.getRecordID(), title, details);
+                        MainActivity.this.apiHelper.updateNoteToAPI(note.getRecordID(), title, details, new APIResponse() {
+                            @Override
+                            public void requestNotesSuccessfulResponse(JSONArray array) {
+                            }
+
+                            @Override
+                            public void requestNotesFailureResponse() {
+                            }
+
+                            @Override
+                            public void saveNoteSuccessfulResponse() {
+                            }
+
+                            @Override
+                            public void saveNoteFailureResponse() {
+                            }
+
+                            @Override
+                            public void editNoteSuccessfulResponse(JSONObject jsonObject) {
+                                String title = null;
+                                String details = null;
+                                try {
+                                    title = jsonObject.getString("title");
+                                    details = jsonObject.getString("details");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (null != title && null != details) {
+                                    NoteDetailsFragment.FRAGMENT.updateCurrentNote(title, details);
+                                }
+
+                                Toast.makeText(MainActivity.this, getString(R.string.notesUpdated), Toast.LENGTH_SHORT).show();
+                                AnalyticsManager.getInstance().fireEvent("note updated successfully", null);
+                            }
+
+                            @Override
+                            public void editNoteFailureResponse() {
+                                NoteDetailsFragment.FRAGMENT.showLoadingError();
+                                AnalyticsManager.getInstance().fireEvent("error updating note to API", null);
+                            }
+
+                            @Override
+                            public void deleteNotesSuccessfulResponse() {
+                            }
+
+                            @Override
+                            public void deleteNotesFailureResponse() {
+                            }
+
+                            @Override
+                            public void serviceError() {
+                                MainActivity.this.notesListFragment.showLoadingError();
+                            }
+
+                        });
                     }
                 }
             });
@@ -306,41 +285,12 @@ public class MainActivity extends Activity implements NotesListFragment.NotesLis
     }
 
     @Override
-    public Cursor queryContentProvider() {
-        // A "projection" defines the columns that will be returned for each row
-        String[] projection = {
-                NotesProvider.NotesData.RECORD_ID_COLUMN,
-                NotesProvider.NotesData.TITLE_COLUMN,
-                NotesProvider.NotesData.DETAILS_COLUMN
-        };
-
-        // Initializes an array to contain selection arguments
-        String[] selectionArgs = {""};
-
-        // Does a query against the table and returns a Cursor object
-        Cursor cursor = getContentResolver().query(
-                NotesProvider.NotesData.CONTENT_URI,  // The content URI of the notes table
-                projection,                           // The columns to return for each row
-                null,                                 // Either null, or the word the user entered
-                selectionArgs,                                 // Either empty, or the string the user entered
-                "DESC");                              // The sort order for the returned rows
-
-        // Some providers return null if an error occurs, others throw an exception
-        if (null != cursor) {
-            return cursor;
-        }
-
-        return null;
-    }
-
-    @Override
     public void shareNote(Intent shareIntent) {
         startActivity(Intent.createChooser(shareIntent, "Share via"));
     }
 
     @Override
     public void setNote(Note note) {
-        this.note = note;
     }
 
     @Override
@@ -354,7 +304,6 @@ public class MainActivity extends Activity implements NotesListFragment.NotesLis
 
     @Override
     public void dismissNote() {
-
     }
 
     @Override
@@ -396,22 +345,6 @@ public class MainActivity extends Activity implements NotesListFragment.NotesLis
             noteDetailsIntent.putExtra("index", index);
             startActivity(noteDetailsIntent, null);
             AnalyticsManager.getInstance().fireEvent("opened a note", null);
-        }
-    }
-
-    /**
-     * Receives the result of the NewNoteActivity
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == NEW_NOTE_REQUEST_CODE) {
-            if(resultCode == RESULT_OK){
-                String title = data.getStringExtra(getString(R.string.titleKey));
-                String details = data.getStringExtra(getString(R.string.detailsKey));
-                saveNoteToAPI(title, details);
-            }
         }
     }
 }

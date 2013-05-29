@@ -26,10 +26,5 @@
                  android:label="@string/myNotesAPIServie" >
         </service>
 
-        <provider android:name=".ContentProviders.NotesProvider"
-                  android:authorities="com.jeremyfox.My_Notes.notesprovider"
-                  android:exported="true">
-        </provider>
-
     </application>
 </manifest> 

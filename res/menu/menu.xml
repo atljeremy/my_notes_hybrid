@@ -3,11 +3,6 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent">
 
-    <item android:id="@+id/load_from_content_provider"
-          android:icon="@drawable/my_notes_icon"
-          android:title="@string/testingContentProvider"
-          android:showAsAction="ifRoom|withText" />
-
     <item android:id="@+id/sync_notes"
           android:icon="@drawable/ic_action_refresh"
           android:title="@string/syncNotes"
