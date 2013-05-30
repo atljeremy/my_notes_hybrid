@@ -2,9 +2,11 @@ package com.jeremyfox.My_Notes.Activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 import com.jeremyfox.My_Notes.Classes.JSInterface;
 import com.jeremyfox.My_Notes.Helpers.APIHelper;
@@ -24,17 +26,25 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
 
     private WebView webView;
     private APIHelper apiHelper;
+    private ProgressDialog dialog;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_note);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        showLoadingDialog();
+
+        this.apiHelper = new APIHelper(this);
         this.webView = (WebView)findViewById(R.id.newNoteWebView);
         this.webView.getSettings().setJavaScriptEnabled(true);
-        this.webView.addJavascriptInterface(new JSInterface((JSInterface.Receiver)this), "MyNotes");
-        this.webView.loadUrl("http://www.google.com");
-        this.apiHelper = new APIHelper(this);
+        this.webView.addJavascriptInterface(new JSInterface(this, this), "MyNotesNative");
+        this.webView.loadUrl("http://192.168.1.115:3000/new_note");
+        this.webView.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                NewNoteActivity.this.dialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -49,6 +59,12 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
 
     @Override
     public void onSaveNote(String title, String description) {
+        if ((null == title || title.length() == 0 || title.equals("undefined"))
+                && (null == description || description.length() == 0 || description.equals("undefined"))) {
+            showRequiredFieldsError();
+            return;
+        }
+        showSavingDialog();
         this.apiHelper.saveNoteToAPI(title, description, new APIResponse() {
             @Override
             public void requestNotesSuccessfulResponse(JSONArray array) {
@@ -59,6 +75,7 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
 
             @Override
             public void saveNoteSuccessfulResponse() {
+                NewNoteActivity.this.dialog.dismiss();
                 AnalyticsManager.getInstance().fireEvent("new note created successfully", null);
                 Toast.makeText(NewNoteActivity.this, getString(R.string.noteSaved), Toast.LENGTH_LONG).show();
                 finish();
@@ -66,6 +83,7 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
 
             @Override
             public void saveNoteFailureResponse() {
+                NewNoteActivity.this.dialog.dismiss();
                 showSavingError();
                 AnalyticsManager.getInstance().fireEvent("error saving new note to API", null);
             }
@@ -84,6 +102,7 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
             }
             @Override
             public void serviceError() {
+                NewNoteActivity.this.dialog.dismiss();
                 showSavingError();
                 AnalyticsManager.getInstance().fireEvent("error saving new note to API - servie error", null);
             }
@@ -100,5 +119,41 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
                 .setNegativeButton("Ok", null)
                 .create()
                 .show();
+    }
+
+    /**
+     * Show required fields error.
+     */
+    public void showRequiredFieldsError() {
+        new AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage("Title and Details are required feilds.")
+                .setNegativeButton("Ok", null)
+                .create()
+                .show();
+    }
+
+    /**
+     * Shows the loading spinner dialog
+     * @return ProgressDialog the progress dialog that will be displayed while loading notes from the API
+     */
+    private void showSavingDialog() {
+        if (null == this.dialog) this.dialog = new ProgressDialog(this);
+        this.dialog.setMessage("Saving Note...");
+        this.dialog.setCancelable(false);
+        this.dialog.show();
+        AnalyticsManager.getInstance().fireEvent("showed saving note dialog", null);
+    }
+
+    /**
+     * Shows the loading spinner dialog
+     * @return ProgressDialog the progress dialog that will be displayed while loading notes from the API
+     */
+    private void showLoadingDialog() {
+        if (null == this.dialog) this.dialog = new ProgressDialog(this);
+        this.dialog.setMessage("Loading...");
+        this.dialog.setCancelable(false);
+        this.dialog.show();
+        AnalyticsManager.getInstance().fireEvent("showed loading new note screen dialog", null);
     }
 }

@@ -3,6 +3,7 @@ package com.jeremyfox.My_Notes.Classes;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
+import android.widget.Toast;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,19 +26,19 @@ public class JSInterface {
         this.context = context;
     }
 
-    public JSInterface(Receiver receiver) {
+    public JSInterface(Context context, Receiver receiver) {
+        this.context = context;
         this.receiver = receiver;
     }
 
     @JavascriptInterface
-    public void savenote(String title, String description){
+    public void saveNote(String title, String description){
         Log.d("TITLE: ", title);
         Log.d("TITLE: ", description);
 
         if (null != this.receiver) {
             this.receiver.onSaveNote(title, description);
         }
-
     }
 
 }
