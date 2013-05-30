@@ -18,6 +18,8 @@ public class JSInterface {
         public void onSaveNote(String title, String description, final Boolean shouldFinish);
     }
 
+    public static final String WEB_URL = "https://young-cove-5823.herokuapp.com/new_note";
+    public static final String WEB_URL_DEBUG = "http://192.168.1.115:3000/new_note";
     private Context context;
     private Receiver receiver;
 

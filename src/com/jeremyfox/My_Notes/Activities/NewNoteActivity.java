@@ -39,7 +39,7 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
         this.webView = (WebView)findViewById(R.id.newNoteWebView);
         this.webView.getSettings().setJavaScriptEnabled(true);
         this.webView.addJavascriptInterface(new JSInterface(this, this), "MyNotesNative");
-        this.webView.loadUrl("http://192.168.1.115:3000/new_note");
+        this.webView.loadUrl(JSInterface.WEB_URL);
         this.webView.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 NewNoteActivity.this.dialog.dismiss();
