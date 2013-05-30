@@ -58,7 +58,7 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
     }
 
     @Override
-    public void onSaveNote(String title, String description) {
+    public void onSaveNote(String title, String description, final Boolean shouldFinish) {
         if ((null == title || title.length() == 0 || title.equals("undefined"))
                 && (null == description || description.length() == 0 || description.equals("undefined"))) {
             showRequiredFieldsError();
@@ -78,7 +78,7 @@ public class NewNoteActivity extends Activity implements JSInterface.Receiver {
                 NewNoteActivity.this.dialog.dismiss();
                 AnalyticsManager.getInstance().fireEvent("new note created successfully", null);
                 Toast.makeText(NewNoteActivity.this, getString(R.string.noteSaved), Toast.LENGTH_LONG).show();
-                finish();
+                if (shouldFinish) finish();
             }
 
             @Override
